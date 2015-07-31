@@ -39,7 +39,7 @@ install(
 )
 
 install(
-    DIRECTORY "cereal"
+    DIRECTORY "include"
     DESTINATION "${include_install_dir}"
 )
 
