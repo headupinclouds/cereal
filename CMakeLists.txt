@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.6.2)
-project (cereal)
+project (cereal 1.1.2)
 
 option(SKIP_PORTABILITY_TEST "Skip portability tests" OFF)
 
