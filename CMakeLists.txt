@@ -52,6 +52,7 @@ install(
     EXPORT "${targets_export_name}"
     NAMESPACE "${namespace}"
     DESTINATION "${config_install_dir}"
+)
 
 #
 # Begining of the standard (non-hunterized) CMakeLists
