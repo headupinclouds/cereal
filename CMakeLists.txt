@@ -8,7 +8,7 @@
 # Provide interface lib for clean package config use
 #
 
-cmake_minimum_required (VERSION 2.6.2)
+cmake_minimum_required (VERSION 3.0)
 project (cereal VERSION 1.1.2)
 
 add_library(cereal INTERFACE)
