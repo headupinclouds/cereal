@@ -29,13 +29,14 @@ foreach(TEST_SOURCE ${TESTS})
     add_executable(${TEST_TARGET} ${TEST_SOURCE})
     set_target_properties(${TEST_TARGET} PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK;BOOST_TEST_MODULE=${TEST_TARGET}")
     target_link_libraries(${TEST_TARGET} ${Boost_LIBRARIES})
+    target_link_libraries(${TEST_TARGET} ${CEREAL_THREAD_LIBS})
     add_test("${TEST_TARGET}" "${TEST_TARGET}")
 
     # TODO: This won't work right now, because we would need a 32-bit boost
     ## If we are on a 64-bit machine, create an extra 32-bit version of the test
     #if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     #  add_executable(${TEST_TARGET}_32 ${TEST_SOURCE})
-    #  set_target_properties(${TEST_TARGET}_32 PROPERTIES 
+    #  set_target_properties(${TEST_TARGET}_32 PROPERTIES
     #    COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK;BOOST_TEST_MODULE=${TEST_TARGET}"
     #    COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
     #  target_link_libraries(${TEST_TARGET}_32 ${Boost_LIBRARIES})
@@ -66,12 +67,17 @@ foreach(TEST_SOURCE ${TESTS})
 
   if(IS_SPECIAL_TEST EQUAL -1)
     add_dependencies(coverage ${COVERAGE_TARGET})
-    
+
     add_executable(${COVERAGE_TARGET} EXCLUDE_FROM_ALL ${TEST_SOURCE})
     set_target_properties(${COVERAGE_TARGET} PROPERTIES COMPILE_DEFINITIONS "BOOST_TEST_DYN_LINK;BOOST_TEST_MODULE=${COVERAGE_TARGET}")
     set_target_properties(${COVERAGE_TARGET} PROPERTIES COMPILE_FLAGS "-coverage")
     set_target_properties(${COVERAGE_TARGET} PROPERTIES LINK_FLAGS "-coverage")
     set_target_properties(${COVERAGE_TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/coverage")
     target_link_libraries(${COVERAGE_TARGET} ${Boost_LIBRARIES})
+    target_link_libraries(${COVERAGE_TARGET} ${CEREAL_THREAD_LIBS})
   endif()
 endforeach()
+
+if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+  add_test(test_cmake_config_module ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake-config-module.cmake)
+endif()
