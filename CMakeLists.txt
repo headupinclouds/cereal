@@ -1,14 +1,69 @@
-cmake_minimum_required (VERSION 2.6.2)
-project (cereal)
+cmake_minimum_required (VERSION 3.0) # hunter minimum
+project (cereal VERSION 1.2.1)
 
 option(SKIP_PORTABILITY_TEST "Skip portability tests" OFF)
 if(NOT CMAKE_VERSION VERSION_LESS 3.0) # installing cereal requires INTERFACE lib
     option(JUST_INSTALL_CEREAL "Don't do anything besides installing the library" OFF)
 endif()
 
+if(NOT CMAKE_VERSION VERSION_LESS 3.0)
+    add_library(cereal INTERFACE)
+    target_include_directories(cereal INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        )
+
+      ### Install ###
+      # Note: I'm opting for boilerplate hunter install and package config to make
+      # sure hunter compatibility is preserved.  This looks very close to the
+      # upstream CMAke.
+      
+      set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+      set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+      set(include_install_dir "include")
+      set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+      set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+      set(targets_export_name "${PROJECT_NAME}Targets")
+      set(namespace "${PROJECT_NAME}::")
+
+      include(CMakePackageConfigHelpers)
+      write_basic_package_version_file(
+        "${version_config}" COMPATIBILITY SameMajorVersion
+        )
+
+      # Note: use 'targets_export_name'
+      configure_file("cmake/Config.cmake.in" "${project_config}" @ONLY)
+
+      install(
+        TARGETS cereal
+        EXPORT "${targets_export_name}"
+        INCLUDES DESTINATION "${include_install_dir}"
+        )
+
+      install(
+        DIRECTORY "include/cereal"
+        DESTINATION "${include_install_dir}"
+        )
+
+      install(
+        FILES "${project_config}" "${version_config}"
+        DESTINATION "${config_install_dir}"
+        )
+
+      install(
+        EXPORT "${targets_export_name}"
+        NAMESPACE "${namespace}"
+        DESTINATION "${config_install_dir}"
+        )
+endif()
+
+if(JUST_INSTALL_CEREAL)
+    return()
+  endif()
+
 option(THREAD_SAFE "Use mutexes to ensure thread safety" OFF)
 if(THREAD_SAFE)
-    add_definitions(-DCEREAL_THREAD_SAFE=1)
+    target_compile_definitions(cereal PUBLIC CEREAL_THREAD_SAFE=1)
     set(CEREAL_THREAD_LIBS "pthread")
 else()
     set(CEREAL_THREAD_LIBS "")
@@ -28,23 +83,6 @@ if(NOT MSVC)
         endif()
         set(CMAKE_CXX_STANDARD_REQUIRED ON)
     endif()
-endif()
-
-if(NOT CMAKE_VERSION VERSION_LESS 3.0)
-    add_library(cereal INTERFACE)
-    target_include_directories(cereal INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-    )
-    install(TARGETS cereal EXPORT cereal
-        DESTINATION lib) # ignored
-    install(EXPORT cereal FILE cereal-config.cmake
-        DESTINATION share/cmake/cereal)
-    install(DIRECTORY include/cereal DESTINATION include)
-endif()
-
-if(JUST_INSTALL_CEREAL)
-    return()
 endif()
 
 include_directories(./include)
