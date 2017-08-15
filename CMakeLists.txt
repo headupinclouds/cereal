@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0) # hunter minimum
-project (cereal VERSION 1.2.1)
+project (cereal VERSION 1.2.2)
 
 option(SKIP_PORTABILITY_TEST "Skip portability (32 bit) tests" OFF)
 if(NOT CMAKE_VERSION VERSION_LESS 3.0) # installing cereal requires INTERFACE lib
