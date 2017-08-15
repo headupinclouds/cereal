@@ -55,8 +55,10 @@ namespace cereal
   //! The size type used by cereal
   /*! To ensure compatability between 32, 64, etc bit machines, we need to use
       a fixed size type instead of size_t, which may vary from machine to
-      machine. */
-  using size_type = uint64_t;
+      machine.
+
+      The default value for CEREAL_SIZE_TYPE is specified in cereal/macros.hpp */
+  using size_type = CEREAL_SIZE_TYPE;
 
   // forward decls
   class BinaryOutputArchive;
@@ -208,7 +210,7 @@ namespace cereal
   {
     //! Internally store the pointer as a void *, keeping const if created with
     //! a const pointer
-    using PT = typename std::conditional<std::is_const<typename std::remove_pointer<T>::type>::value,
+    using PT = typename std::conditional<std::is_const<typename std::remove_pointer<typename std::remove_reference<T>::type>::type>::value,
                                          const void *,
                                          void *>::type;
 
